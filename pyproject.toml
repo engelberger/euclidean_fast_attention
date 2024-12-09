@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "euclidean_fast_attention"
+version = "0.0.1"
+description = "Euclidean fast attention: Machine learning global atomic representation."
+authors = ["J. Thorben Frank", "Stefan Chmiela", "Klaus-Robert Müller", "Oliver T. Unke"]
+license = "MIT"
+
+
+[tool.poetry.dependencies]
+python = ">=3.11"
+numpy = "*"
+e3x = "*"
+flax = "*"
+pytest = "*"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+

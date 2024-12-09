@@ -1,2 +1,3 @@
-# euclidean_fast_attention
-Implementation of the Euclidean fast attention (EFA) algorithm
+### Euclidean Fast Attention: Machine Learning Global Atomic Representations at Linear Cost
+
+Reference implementation of the Euclidean fast attention (EFA) algorithm.
