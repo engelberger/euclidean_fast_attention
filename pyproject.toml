@@ -12,7 +12,8 @@ numpy = "*"
 e3x = "*"
 flax = "*"
 pytest = "*"
-
+matplotlib = "*"
+scipy = "*"
 
 [build-system]
 requires = ["poetry-core"]

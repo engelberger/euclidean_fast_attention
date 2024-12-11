@@ -52,6 +52,46 @@ def frequency_init_fn(
 
 
 class EuclideanFastAttention(nn.Module):
+    r"""Euclidean fast attention module for calculating global equivariant atomic representations given node features
+        and node positions.
+
+
+        Attributes:
+
+        lebedev_num: Number of Lebedev grid points. Default: 6 (this will be to small for most cases)
+        parametrized: Features are refined via trainable query, key and value matrix before passed to the attention
+            update. Default: True
+        num_features_qk: Feature dimension for query and key. Defaults to feature dimension of the input features.
+        max_degree_qk: Maximal degree for query and key. Defaults to maximal degree of the input features.
+        include_pseudotensors_qk: Include pseudotensors from the query and key.
+        num_features_v: Feature dimension for value. Defaults to feature dimension of the input features.
+        max_degree_v: Maximal degree for value. Defaults to maximal degree of the input features.
+        include_pseudotensors_v: Include pseudotensors from the value.
+        activation_fn: Activation function to apply to query and key. Must be equivariant for equivariant features so
+            choose one from
+            https://e3x.readthedocs.io/stable/_autosummary/e3x.nn.activations.html#module-e3x.nn.activations
+        tensor_integration: Perform tensor integration, If `True` perform Eq. 23 with the tensor product otherwise
+            no tensor product.
+        ti_max_degree_sph: Maximal degree of the spherical harmonics vector in the tensor integration, maximal
+            degree of Y in Eq. 13 and L_Y in Eq. 23.
+        ti_include_pseudotensors: If ``False``, all coupling paths that produce
+            pseudotensors are omitted in the tensor product.
+        ti_max_degree: Maximal degree of the tensor integration. L_out in Eq. 23.
+        ti_parametrize_coupling_paths: Trainable parameters for valid coupling paths between the degrees.
+        ti_degree_scaling_constants: Constants for degree re-scaling, described in the SI of the EFA paper.
+            There is one scaling constant per degree in the spherical harmonics vectors. Maximal degree is specified
+            via ti_max_degree_sph.
+        epe_frequency_init_fn: Function how to choose the frequencies for Euclidean rotary positional
+            encodings (ERoPE).
+        epe_num_frequencies: Deprecated. Will be removed soon.
+        epe_max_frequency: Maximal frequency b_max in Eq. 24. Should be chosen in accordance to the number of
+            Lebedev points, see Tab. S3.
+        epe_max_length: Maximal length. The "true" maximal frequency is then calculated via Eq. 24 as
+            omega_max = epe_max_frequency / epe_max_length. This is then also omega_K in Eq. 20.
+        epe_frequencies_trainable: Frequencies are trainable. Use with care, since this can lead to frequencies which
+            become too large for the Lebedev quadrature.
+        param_dtype: The dtype passed to parameter initializers.
+        """
     lebedev_num: int = 6
     parametrized: bool = True
 
@@ -88,6 +128,32 @@ class EuclideanFastAttention(nn.Module):
             batch_segments: Array,
             graph_mask: Array
     ):
+        """
+        Given equivariant input features and node positions, calculate a Euclidean fast attention update.
+        Args:
+            inputs (): (num_nodes, 1 or 2, (max_degree + 1)**2, num_features) - Equivariant node features
+                The convention for equivariant features follows https://e3x.readthedocs.io/stable/index.html so
+                check it out for a detailed introduction.
+            positions (): (num_nodes, 3) - Node positions.
+            batch_segments (): (num_nodes) - The batch a node belongs to. For example assume a batch of two
+                molecules / graphs, where the first has 3 atoms and the second has 2 atoms. The batch_segments
+                would then be [0, 0, 0, 1, 1]. Since JAX requires static shapes for jit compilation,
+                batch_segments are usually padded towards a fixed length, such that the remaining entries
+                are filled with a padding index. For a fixed batch size of 7 nodes, this yields
+                batch_segments [0, 0, 0, 1, 1, 2, 2]. The corresponding graph_mask is then
+                [True, True, False]. For details about graph batching see also
+                https://e3x.readthedocs.io/stable/examples/md17_ethanol.html and
+                https://jraph.readthedocs.io/en/latest/api.html#batching-padding-utilities.
+            graph_mask (): (num_graphs) - Labels which graphs are "true" graphs and which are padded.
+                I.e. for the batch_segments example from above, it would be
+                [True, True] and [True, True, False].
+
+        Returns:
+            Updated features. Output shape depends on the specific settings, but will be the same shape as
+            `inputs` for default settings.
+
+
+        """
 
         max_degree_inputs = int(np.rint(np.sqrt(inputs.shape[-2]) - 1).item())
 
@@ -238,28 +304,6 @@ class EuclideanFastAttention(nn.Module):
                 ti_include_pseudotensors = inputs.shape[-3] == 2
             else:
                 ti_include_pseudotensors = self.ti_include_pseudotensors
-
-            # build imag_unit * q by permutation and sign flip for imag part in query.
-            # imag_q = q#jnp.stack([-q[..., 1::2], q[..., ::2]], axis=-1).reshape(q.shape)
-            # imag_beta = rope.apply(
-            #     q=self.activation_fn(imag_q),
-            #     k=self.activation_fn(k),
-            #     v=v,
-            #     pos=positions,
-            #     theta=frequencies,
-            #     grid_u=grid_u,
-            #     grid_w=grid_w,
-            #     batch_segments=batch_segments,
-            #     graph_mask=graph_mask,
-            #     include_pseudotensors_qk=self.include_pseudotensors_qk,
-            #     include_pseudotensors_v=self.include_pseudotensors_v,
-            #     max_degree_qk=self.max_degree_qk,
-            #     max_degree_v=self.max_degree_v,
-            #     # Determines values at grid points are present or already summed over.
-            #     do_integration=False,
-            # )  # (N, M, P, L, F) or (N, P, L, F)
-            #
-            # beta = e3x.nn.add(beta, imag_beta)
 
             # Expand grid points in spherical harmonics basis.
             grid_u_sph = jnp.expand_dims(
