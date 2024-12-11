@@ -3,10 +3,5 @@
 
 ### Euclidean Fast Attention: Machine Learning Global Atomic Representations at Linear Cost
 
-Reference implementation of the Euclidean fast attention (EFA) algorithm. Example usage:
-
-```python
-
-
-
-```
+Reference implementation of the Euclidean fast attention (EFA) algorithm. For a minimal example check the `examples/` 
+folder. More details including models with EFA will come soon.
