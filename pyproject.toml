@@ -14,6 +14,8 @@ flax = "*"
 pytest = "*"
 matplotlib = "*"
 scipy = "*"
+optax = "*"
+wandb = "*"
 
 [build-system]
 requires = ["poetry-core"]
