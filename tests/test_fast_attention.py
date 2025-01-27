@@ -9,8 +9,6 @@ import pytest
 
 from euclidean_fast_attention import fast_attention
 
-jax.config.update('jax_enable_x64', True)
-
 
 @pytest.mark.parametrize("include_pseudotensors_inputs", [True, False])
 @pytest.mark.parametrize("include_pseudotensors_qk", [True, False, None])
@@ -647,7 +645,7 @@ def test_rotation_equivariance(
         num_features,
         lebedev_num
 ):
-    jax.config.update('jax_enable_x64', False)
+    jax.config.update('jax_enable_x64', True)
 
     num_nodes = 11
 
@@ -791,6 +789,7 @@ def test_rotation_equivariance_tensor_integration(
         ti_max_degree,
         lebedev_num,
 ):
+    jax.config.update('jax_enable_x64', True)
 
     num_nodes = 11
 
