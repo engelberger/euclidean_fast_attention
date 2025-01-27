@@ -789,7 +789,7 @@ def test_rotation_equivariance_tensor_integration(
         ti_max_degree,
         lebedev_num,
 ):
-    jax.config.update('jax_enable_x64', False)
+    jax.config.update('jax_enable_x64', True)
 
     num_nodes = 11
 
