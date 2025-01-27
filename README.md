@@ -1,5 +1,6 @@
 ![workflow-test-ci](https://github.com/thorben-frank/euclidean_fast_attention/actions/workflows/CI.yml/badge.svg)
 [![preprint-link](https://img.shields.io/badge/paper-arxiv.org-B31B1B)](https://arxiv.org/abs/2412.08541)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14750286.svg)](https://doi.org/10.5281/zenodo.14750286)
 
 ![Logo](overview.png)
 
@@ -35,6 +36,10 @@ pip install .
 For example usages check the `examples/` folder. It contains an examples for basic usage of the `EuclideanFastAttention` 
 `flax` module. Additionally, you can find examples on how to train an O(3) equivariant MPNN with enabled / disabled 
 EFA block to reproduce the results from the paper. 
+
+### Datasets
+A few data sets that are used throughout the examples are included here in the repository under the `datasets` folder.
+All datasets can be found in the corresponding [zenodo repository](https://doi.org/10.5281/zenodo.14750286).  
 
 #### Citation
 If you find this repository useful or use the Euclidean fast attention algorithm in your research please
