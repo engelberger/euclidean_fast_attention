@@ -607,7 +607,7 @@ class NpzTrainer:
                 train_metrics = {
                     f'train_{k}': float(v) for k, v in train_metrics.items()
                 }
-                if total_step % self.log_interval_steps == 0:
+                if (total_step + 1) % self.log_interval_steps == 0:
                     if self.use_wandb:
                         wandb.log(data=train_metrics, step=total_step)
                     else:

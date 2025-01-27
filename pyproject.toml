@@ -16,6 +16,7 @@ matplotlib = "*"
 scipy = "*"
 optax = "*"
 wandb = "*"
+orbax-checkpoint = "*"
 
 [build-system]
 requires = ["poetry-core"]
