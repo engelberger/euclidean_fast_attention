@@ -18,6 +18,7 @@ optax = "*"
 wandb = "*"
 orbax-checkpoint = "*"
 jraph = "*"
+clu = "*"
 
 [build-system]
 requires = ["poetry-core"]
