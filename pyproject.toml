@@ -17,6 +17,7 @@ scipy = "*"
 optax = "*"
 wandb = "*"
 orbax-checkpoint = "*"
+jraph = "*"
 
 [build-system]
 requires = ["poetry-core"]
